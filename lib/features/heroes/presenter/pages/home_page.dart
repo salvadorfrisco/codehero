@@ -155,8 +155,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   body: constraints.maxWidth > 600
                       ? _buildWebLayout()
-                      : _buildMobileLayout() // Seu conteúdo aqui
-                  );
+                      : _buildMobileLayout());
             },
           ),
         ));
@@ -226,14 +225,10 @@ class _HomePageState extends State<HomePage> {
                 ))
               : heroesList.isNotEmpty
                   ? Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 8,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: HeroList(
                         heroesList: heroesList,
                         web: true,
-                        //web: true,
                       ),
                     )
                   : Center(

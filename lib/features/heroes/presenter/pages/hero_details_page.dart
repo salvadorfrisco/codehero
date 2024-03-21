@@ -21,43 +21,45 @@ class HeroDetailsPage extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (web) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Image.network(hero.thumbnail.toString()),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 3,
-                      child: _buildDetails(context),
-                    ),
-                  ],
-                );
-              } else {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: constraints.maxWidth,
-                      height: constraints.maxWidth,
-                      child: Image.network(hero.thumbnail.toString()),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildDetails(context),
-                  ],
-                );
-              }
-            },
-          ),
-        ),
+        padding: const EdgeInsets.all(16.0),
+        child: _buildContent(context),
       ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (web) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 2,
+                child: Image.network(hero.thumbnail.toString()),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                flex: 3,
+                child: _buildDetails(context),
+              ),
+            ],
+          );
+        } else {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: constraints.maxWidth,
+                height: constraints.maxWidth,
+                child: Image.network(hero.thumbnail.toString()),
+              ),
+              const SizedBox(height: 16),
+              _buildDetails(context),
+            ],
+          );
+        }
+      },
     );
   }
 
@@ -65,77 +67,54 @@ class HeroDetailsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Visibility(
-          visible: hero.description.isNotEmpty,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              Text(
-                'Descrição',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              Text(hero.description,
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColorDark,
-                  )),
-            ],
-          ),
+        _buildSection(
+          context,
+          title: 'Descrição',
+          items: [hero.description],
         ),
-        Visibility(
-          visible: hero.series.items.isNotEmpty,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              Text(
-                'Séries',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: hero.series.items
-                    .map(
-                      (series) => Text(
-                        series.name,
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColorDark,
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ],
-          ),
+        _buildSection(
+          context,
+          title: 'Séries',
+          items: hero.series.items.map((series) => series.name).toList(),
         ),
-        Visibility(
-          visible: hero.events.items.isNotEmpty,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              Text(
-                'Eventos',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              ...hero.events.items.map((event) {
-                return Text(
-                  event['name'],
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColorDark,
-                  ),
-                );
-              }),
-            ],
-          ),
+        _buildSection(
+          context,
+          title: 'Eventos',
+          items: hero.events.items
+              .map<String>((event) => event['name'] as String)
+              .toList(),
         ),
       ],
+    );
+  }
+
+  Widget _buildSection(BuildContext context,
+      {required String title, required List<String> items}) {
+    return Visibility(
+      visible: items.isNotEmpty,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: items.map((item) {
+              return Text(
+                item,
+                style: TextStyle(
+                  color: Theme.of(context).primaryColorDark,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }
