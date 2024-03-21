@@ -5,6 +5,7 @@ import 'package:hero/features/heroes/presenter/pages/hero_details_page.dart';
 class HeroList extends StatelessWidget {
   final List<HeroModel> heroesList;
   final bool web;
+
   const HeroList({
     super.key,
     required this.heroesList,
@@ -50,9 +51,8 @@ class HeroList extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Visibility(
-                      visible: web && hero.events.items.isNotEmpty,
-                      child: Expanded(
+                    if (web)
+                      Expanded(
                         flex: 1,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -71,10 +71,8 @@ class HeroList extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ),
-                    Visibility(
-                      visible: web && hero.events.items.isNotEmpty,
-                      child: Expanded(
+                    if (web)
+                      Expanded(
                         flex: 2,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -93,7 +91,6 @@ class HeroList extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
