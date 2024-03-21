@@ -90,31 +90,32 @@ class HeroDetailsPage extends StatelessWidget {
 
   Widget _buildSection(BuildContext context,
       {required String title, required List<String> items}) {
-    return Visibility(
-      visible: items.isNotEmpty,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-            ),
+    if (items.isEmpty || items[0].isEmpty) {
+      return Container();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          title,
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: items.map((item) {
-              return Text(
-                item,
-                style: TextStyle(
-                  color: Theme.of(context).primaryColorDark,
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: items.map((item) {
+            return Text(
+              item,
+              style: TextStyle(
+                color: Theme.of(context).primaryColorDark,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }

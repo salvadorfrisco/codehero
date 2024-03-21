@@ -30,7 +30,10 @@ class HeroList extends StatelessWidget {
                       web: web,
                     ),
                   ),
-                );
+                ).then((_) {
+                  // This is executed when the HeroDetailsPage is popped
+                  FocusManager.instance.primaryFocus?.unfocus();
+                });
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 18.0),
