@@ -83,127 +83,270 @@ class _HomePageState extends State<HomePage> {
           FocusScope.of(context).unfocus();
         },
         child: SafeArea(
-          child: Scaffold(
-            appBar: AppBar(
-              toolbarHeight: 136,
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 12),
-                    RichText(
-                      text: TextSpan(
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'BUSCA MARVEL',
-                            style: Theme.of(context).textTheme.titleLarge,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Scaffold(
+                  appBar: AppBar(
+                    toolbarHeight: 136,
+                    title: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: 'BUSCA MARVEL',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge,
+                                    ),
+                                    TextSpan(
+                                      text: 'TESTE FRONTEND',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall,
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Visibility(
+                                visible: constraints.maxWidth > 600,
+                                child: Text('SALVADOR FRISCO',
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall),
+                              ),
+                            ],
                           ),
-                          TextSpan(
-                            text: 'TESTE FRONTEND',
-                            style: Theme.of(context).textTheme.titleSmall,
-                          )
+                          Container(
+                            width: 54,
+                            height: 4,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          const SizedBox(height: 12),
+                          Text('Nome do Personagem',
+                              style: Theme.of(context).textTheme.titleSmall),
+                          SizedBox(
+                            height: 40,
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 8.0),
+                              ),
+                              textAlignVertical: TextAlignVertical.center,
+                              onChanged: (value) {
+                                setState(() {
+                                  filterName = value.isEmpty ? null : value;
+                                });
+                                _loadHeroes();
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                         ],
                       ),
                     ),
-                    Container(
-                      width: 54,
-                      height: 4,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    const SizedBox(height: 12),
-                    Text('Nome do Personagem',
-                        style: Theme.of(context).textTheme.titleSmall),
-                    SizedBox(
-                      height: 40,
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                        ),
-                        textAlignVertical: TextAlignVertical.center,
-                        onChanged: (value) {
-                          setState(() {
-                            filterName = value.isEmpty ? null : value;
-                          });
-                          _loadHeroes();
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ),
-            ),
-            body: Column(
-              children: <Widget>[
-                Container(
-                    color: Theme.of(context).primaryColor,
-                    height: 40,
-                    alignment: Alignment.center,
-                    child: Row(
-                      children: [
-                        const SizedBox(
-                          width: 96,
-                        ),
-                        Text(
-                          'Nome',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    )),
-                Expanded(
-                  child: _isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                          color: Theme.of(context).primaryColor,
-                        )) // Show progress indicator while loading
-                      : heroesList.isNotEmpty
-                          ? HeroList(
-                              heroesList: heroesList,
-                            )
-                          : Center(
-                              child: Text(
-                              'Ops! não há personagens...',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            )),
-                ),
-                const SizedBox(height: 18),
-                Padding(
-                  padding: const EdgeInsets.only(top: 18, bottom: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      IconButton(
-                        onPressed: _previousPage,
-                        icon: const Icon(Icons.arrow_left),
-                        iconSize: 48,
-                        color: currentPage > 0
-                            ? Theme.of(context).primaryColor
-                            : Colors.black26,
-                      ),
-                      const SizedBox(width: 16),
-                      ..._buildPageButtons(),
-                      const SizedBox(width: 16),
-                      IconButton(
-                        onPressed: _nextPage,
-                        icon: const Icon(Icons.arrow_right),
-                        iconSize: 48,
-                        color: currentPage + 1 < (totalHeroes / 4).ceil()
-                            ? Theme.of(context).primaryColor
-                            : Colors.black26,
-                      ),
-                    ],
                   ),
-                ),
-                Container(
-                  color: Theme.of(context).primaryColor,
-                  height: 16,
-                ),
-              ],
-            ),
+                  body: constraints.maxWidth > 600
+                      ? _buildWebLayout()
+                      : _buildMobileLayout() // Seu conteúdo aqui
+                  );
+            },
           ),
         ));
+  }
+
+  Widget _buildWebLayout() {
+    return Column(
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          height: 40,
+          alignment: Alignment.center,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: Container(
+                  color: Theme.of(context).primaryColor,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      'Personagem',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  color: Theme.of(context).primaryColor,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      'Séries',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  color: Theme.of(context).primaryColor,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      'Eventos',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
+                ))
+              : heroesList.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 8,
+                      ),
+                      child: HeroList(
+                        heroesList: heroesList,
+                        web: true,
+                        //web: true,
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                      'Ops! não há personagens...',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    )),
+        ),
+        const SizedBox(height: 18),
+        Padding(
+          padding: const EdgeInsets.only(top: 18, bottom: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              IconButton(
+                onPressed: _previousPage,
+                icon: const Icon(Icons.arrow_left),
+                iconSize: 48,
+                color: currentPage > 0
+                    ? Theme.of(context).primaryColor
+                    : Colors.black26,
+              ),
+              const SizedBox(width: 16),
+              ..._buildPageButtons(),
+              const SizedBox(width: 16),
+              IconButton(
+                onPressed: _nextPage,
+                icon: const Icon(Icons.arrow_right),
+                iconSize: 48,
+                color: currentPage + 1 < (totalHeroes / 4).ceil()
+                    ? Theme.of(context).primaryColor
+                    : Colors.black26,
+              ),
+            ],
+          ),
+        ),
+        Container(
+          color: Theme.of(context).primaryColor,
+          height: 16,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobileLayout() {
+    return Column(
+      children: <Widget>[
+        Container(
+            color: Theme.of(context).primaryColor,
+            height: 40,
+            alignment: Alignment.center,
+            child: Row(
+              children: [
+                const SizedBox(
+                  width: 96,
+                ),
+                Text(
+                  'Nome',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            )),
+        Expanded(
+          child: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
+                ))
+              : heroesList.isNotEmpty
+                  ? HeroList(
+                      heroesList: heroesList,
+                      web: false,
+                    )
+                  : Center(
+                      child: Text(
+                      'Ops! não há personagens...',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    )),
+        ),
+        const SizedBox(height: 18),
+        Padding(
+          padding: const EdgeInsets.only(top: 18, bottom: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              IconButton(
+                onPressed: _previousPage,
+                icon: const Icon(Icons.arrow_left),
+                iconSize: 48,
+                color: currentPage > 0
+                    ? Theme.of(context).primaryColor
+                    : Colors.black26,
+              ),
+              const SizedBox(width: 16),
+              ..._buildPageButtons(),
+              const SizedBox(width: 16),
+              IconButton(
+                onPressed: _nextPage,
+                icon: const Icon(Icons.arrow_right),
+                iconSize: 48,
+                color: currentPage + 1 < (totalHeroes / 4).ceil()
+                    ? Theme.of(context).primaryColor
+                    : Colors.black26,
+              ),
+            ],
+          ),
+        ),
+        Container(
+          color: Theme.of(context).primaryColor,
+          height: 16,
+        ),
+      ],
+    );
   }
 
   List<Widget> _buildPageButtons() {
@@ -237,7 +380,9 @@ class _HomePageState extends State<HomePage> {
         child: Text(
           '$page',
           style: TextStyle(
-            color: isActive ? Colors.white : Theme.of(context).primaryColor,
+            color: isActive
+                ? Theme.of(context).primaryColorLight
+                : Theme.of(context).primaryColor,
           ),
         ),
       ),

@@ -4,9 +4,11 @@ import 'package:hero/features/heroes/presenter/pages/hero_details_page.dart';
 
 class HeroList extends StatelessWidget {
   final List<HeroModel> heroesList;
+  final bool web;
   const HeroList({
     super.key,
     required this.heroesList,
+    required this.web,
   });
 
   @override
@@ -18,35 +20,92 @@ class HeroList extends StatelessWidget {
         return Column(
           children: <Widget>[
             InkWell(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 18.0),
-                  child: ListTile(
-                    title: Text(
-                      hero.name,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    leading: CircleAvatar(
-                      radius: 32.0,
-                      backgroundImage: NetworkImage(
-                          '${hero.thumbnail.path}.${hero.thumbnail.extension}'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HeroDetailsPage(
+                      hero: hero,
+                      web: web,
                     ),
                   ),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HeroDetailsPage(hero: hero),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 18.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: ListTile(
+                        title: Text(
+                          hero.name,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        leading: CircleAvatar(
+                          radius: 32.0,
+                          backgroundImage: NetworkImage(
+                            '${hero.thumbnail.path}.${hero.thumbnail.extension}',
+                          ),
+                        ),
+                      ),
                     ),
-                  );
-                }),
+                    Visibility(
+                      visible: web && hero.events.items.isNotEmpty,
+                      child: Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: hero.series.items
+                                .map(
+                                  (series) => Text(
+                                    series.name,
+                                    style: TextStyle(
+                                      color: Theme.of(context).primaryColorDark,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: web && hero.events.items.isNotEmpty,
+                      child: Expanded(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ...hero.events.items.map((event) {
+                                return Text(
+                                  event['name'],
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColorDark,
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             Padding(
-                padding: const EdgeInsets.only(left: 3),
-                child: Divider(
-                  color: Theme.of(context).primaryColor,
-                  height: 1,
-                  thickness: 1.6,
-                ))
+              padding: const EdgeInsets.only(left: 3),
+              child: Divider(
+                color: Theme.of(context).primaryColor,
+                height: 1,
+                thickness: 1.6,
+              ),
+            )
           ],
         );
       },

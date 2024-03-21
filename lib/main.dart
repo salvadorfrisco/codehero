@@ -15,13 +15,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: const Color(0xFFD42026),
-        secondaryHeaderColor: const Color(0xFF4E4E4E),
+        primaryColorDark: const Color(0xFF4E4E4E),
+        primaryColorLight: const Color(0xFFFFFFFF),
         textTheme: const TextTheme(
             bodyLarge: TextStyle(
-                fontSize: 21,
-                color: Color(
-                  0xFF4E4E4E,
-                )),
+              fontSize: 21,
+              color: Color(0xFF4E4E4E),
+            ),
             bodyMedium: TextStyle(
               color: Color(0x00000fff),
               fontSize: 16,
