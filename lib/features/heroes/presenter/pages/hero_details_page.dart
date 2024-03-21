@@ -3,8 +3,13 @@ import 'package:hero/features/heroes/domain/models/hero_model.dart';
 
 class HeroDetailsPage extends StatelessWidget {
   final HeroModel hero;
+  final bool web;
 
-  const HeroDetailsPage({super.key, required this.hero});
+  const HeroDetailsPage({
+    super.key,
+    required this.hero,
+    required this.web,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,97 +23,119 @@ class HeroDetailsPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.network(hero.thumbnail.toString()),
-              Visibility(
-                visible: hero.description.isNotEmpty,
-                child: Column(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (web) {
+                return Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16),
-                    Text(
-                      'Descrição',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                      ),
+                    Expanded(
+                      flex: 2,
+                      child: Image.network(hero.thumbnail.toString()),
                     ),
-                    Text(hero.description,
-                        style: TextStyle(
-                          color: Theme.of(context).secondaryHeaderColor,
-                        )),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 3,
+                      child: _buildDetails(context),
+                    ),
                   ],
-                ),
-              ),
-              Visibility(
-                visible: hero.events.items.isNotEmpty,
-                child: Column(
+                );
+              } else {
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(
+                      width: constraints.maxWidth,
+                      height: constraints.maxWidth,
+                      child: Image.network(hero.thumbnail.toString()),
+                    ),
                     const SizedBox(height: 16),
-                    Text(
-                      'Séries',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: hero.series.items
-                          .map(
-                            (series) => Text(
-                              series.name,
-                              style: TextStyle(
-                                color: Theme.of(context).secondaryHeaderColor,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ),
+                    _buildDetails(context),
                   ],
-                ),
-              ),
-              Visibility(
-                visible: hero.events.items.isNotEmpty,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16),
-                    Text(
-                      'Eventos',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    ...hero.events.items.map((event) {
-                      return Text(
-                        event['name'],
-                        style: TextStyle(
-                          color: Theme.of(context).secondaryHeaderColor,
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-
-              /* ListView.builder(
-                itemCount: hero.events.items.length,
-                itemBuilder: (context, index) {
-                  final item = hero.events.items[index];
-                  return Text(
-                    item['name'],
-                    style: TextStyle(
-                      color: Theme.of(context).secondaryHeaderColor,
-                    ),
-                  );
-                },
-              ), */
-            ],
+                );
+              }
+            },
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDetails(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Visibility(
+          visible: hero.description.isNotEmpty,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              Text(
+                'Descrição',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              Text(hero.description,
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColorDark,
+                  )),
+            ],
+          ),
+        ),
+        Visibility(
+          visible: hero.series.items.isNotEmpty,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              Text(
+                'Séries',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: hero.series.items
+                    .map(
+                      (series) => Text(
+                        series.name,
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColorDark,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+          ),
+        ),
+        Visibility(
+          visible: hero.events.items.isNotEmpty,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              Text(
+                'Eventos',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              ...hero.events.items.map((event) {
+                return Text(
+                  event['name'],
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColorDark,
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
