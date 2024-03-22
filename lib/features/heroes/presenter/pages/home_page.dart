@@ -1,82 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:hero/features/heroes/domain/models/hero_model.dart';
-
-import 'package:hero/features/heroes/domain/repositories/hero_repository.dart';
+import 'package:hero/features/heroes/presenter/providers/heroes_provider.dart';
 import 'package:hero/features/heroes/presenter/widgets/hero_list.dart';
-import 'package:hero/features/heroes/repositories/hero_repository_impl.dart';
+import 'package:provider/provider.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) {
+        final provider = HeroesProvider();
+        provider.loadHeroes(); // Carrega todos os heróis iniciais
+        return provider;
+      },
+      child: _HomePage(),
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> {
-  final HeroRepository heroRepository = HeroRepositoryImpl();
-  bool _isLoading = true;
-
-  List<HeroModel> heroesList = [];
-  int currentPage = 0;
-  String? filterName;
-  int totalHeroes = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadHeroes();
-  }
-
-  void _loadHeroes() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final response = await heroRepository.getHeroes(
-        offset: currentPage * 4,
-        name: filterName,
-      );
-
-      setState(() {
-        heroesList = response.heroes;
-        totalHeroes = response.total;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _previousPage() {
-    if (currentPage > 0) {
-      setState(() {
-        currentPage--;
-      });
-      _loadHeroes();
-    }
-  }
-
-  void _nextPage() {
-    if ((currentPage + 1) * 4 < totalHeroes) {
-      setState(() {
-        currentPage++;
-      });
-      _loadHeroes();
-    }
-  }
-
-  void _goToPage(int page) {
-    setState(() {
-      currentPage = page - 1;
-    });
-    _loadHeroes();
-  }
-
+class _HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<HeroesProvider>(context);
+
     return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () {
@@ -141,10 +88,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               textAlignVertical: TextAlignVertical.center,
                               onChanged: (value) {
-                                setState(() {
-                                  filterName = value.isEmpty ? null : value;
-                                });
-                                _loadHeroes();
+                                provider.setFilterName(value);
                               },
                             ),
                           ),
@@ -154,14 +98,14 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   body: constraints.maxWidth > 600
-                      ? _buildWebLayout()
-                      : _buildMobileLayout());
+                      ? _buildWebLayout(context, provider)
+                      : _buildMobileLayout(context, provider));
             },
           ),
         ));
   }
 
-  Widget _buildWebLayout() {
+  Widget _buildWebLayout(BuildContext context, HeroesProvider provider) {
     return Column(
       children: <Widget>[
         Container(
@@ -218,16 +162,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         Expanded(
-          child: _isLoading
+          child: provider.isLoading
               ? Center(
                   child: CircularProgressIndicator(
                   color: Theme.of(context).primaryColor,
                 ))
-              : heroesList.isNotEmpty
+              : provider.heroesList.isNotEmpty
                   ? Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: HeroList(
-                        heroesList: heroesList,
+                        heroesList: provider.heroesList,
                         web: true,
                       ),
                     )
@@ -244,23 +188,24 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               IconButton(
-                onPressed: _previousPage,
+                onPressed: provider.previousPage,
                 icon: const Icon(Icons.arrow_left),
                 iconSize: 48,
-                color: currentPage > 0
+                color: provider.currentPage > 0
                     ? Theme.of(context).primaryColor
                     : Colors.black26,
               ),
               const SizedBox(width: 16),
-              ..._buildPageButtons(),
+              ..._buildPageButtons(context, provider),
               const SizedBox(width: 16),
               IconButton(
-                onPressed: _nextPage,
+                onPressed: provider.nextPage,
                 icon: const Icon(Icons.arrow_right),
                 iconSize: 48,
-                color: currentPage + 1 < (totalHeroes / 4).ceil()
-                    ? Theme.of(context).primaryColor
-                    : Colors.black26,
+                color:
+                    provider.currentPage + 1 < (provider.totalHeroes / 4).ceil()
+                        ? Theme.of(context).primaryColor
+                        : Colors.black26,
               ),
             ],
           ),
@@ -273,7 +218,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildMobileLayout() {
+  Widget _buildMobileLayout(BuildContext context, HeroesProvider provider) {
     return Column(
       children: <Widget>[
         Container(
@@ -292,14 +237,14 @@ class _HomePageState extends State<HomePage> {
               ],
             )),
         Expanded(
-          child: _isLoading
+          child: provider.isLoading
               ? Center(
                   child: CircularProgressIndicator(
                   color: Theme.of(context).primaryColor,
                 ))
-              : heroesList.isNotEmpty
+              : provider.heroesList.isNotEmpty
                   ? HeroList(
-                      heroesList: heroesList,
+                      heroesList: provider.heroesList,
                       web: false,
                     )
                   : Center(
@@ -315,23 +260,24 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               IconButton(
-                onPressed: _previousPage,
+                onPressed: provider.previousPage,
                 icon: const Icon(Icons.arrow_left),
                 iconSize: 48,
-                color: currentPage > 0
+                color: provider.currentPage > 0
                     ? Theme.of(context).primaryColor
                     : Colors.black26,
               ),
               const SizedBox(width: 16),
-              ..._buildPageButtons(),
+              ..._buildPageButtons(context, provider),
               const SizedBox(width: 16),
               IconButton(
-                onPressed: _nextPage,
+                onPressed: provider.nextPage,
                 icon: const Icon(Icons.arrow_right),
                 iconSize: 48,
-                color: currentPage + 1 < (totalHeroes / 4).ceil()
-                    ? Theme.of(context).primaryColor
-                    : Colors.black26,
+                color:
+                    provider.currentPage + 1 < (provider.totalHeroes / 4).ceil()
+                        ? Theme.of(context).primaryColor
+                        : Colors.black26,
               ),
             ],
           ),
@@ -344,15 +290,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  List<Widget> _buildPageButtons() {
+  List<Widget> _buildPageButtons(
+      BuildContext context, HeroesProvider provider) {
     final List<Widget> buttons = [];
-    final int totalPages = (totalHeroes / 4).ceil();
-    final int startPage = currentPage > 0 ? currentPage - 1 : currentPage;
+    final int totalPages = (provider.totalHeroes / 4).ceil();
+    final int startPage = provider.currentPage > 0
+        ? provider.currentPage - 1
+        : provider.currentPage;
     final int endPage =
         startPage + 2 < totalPages ? startPage + 2 : totalPages - 1;
 
     for (int i = startPage; i <= endPage; i++) {
-      buttons.add(_buildPageButton(i + 1));
+      buttons.add(_buildPageButton(context, provider, i + 1));
       if (i < endPage) {
         buttons.add(const SizedBox(width: 16));
       }
@@ -361,10 +310,11 @@ class _HomePageState extends State<HomePage> {
     return buttons;
   }
 
-  Widget _buildPageButton(int page) {
-    final isActive = page == currentPage + 1;
+  Widget _buildPageButton(
+      BuildContext context, HeroesProvider provider, int page) {
+    final isActive = page == provider.currentPage + 1;
     return GestureDetector(
-      onTap: () => _goToPage(page),
+      onTap: () => provider.goToPage(page),
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
