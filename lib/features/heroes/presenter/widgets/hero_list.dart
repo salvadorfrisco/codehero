@@ -31,7 +31,6 @@ class HeroList extends StatelessWidget {
                     ),
                   ),
                 ).then((_) {
-                  // This is executed when the HeroDetailsPage is popped
                   FocusManager.instance.primaryFocus?.unfocus();
                 });
               },

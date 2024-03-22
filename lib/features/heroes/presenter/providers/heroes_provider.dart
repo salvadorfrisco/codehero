@@ -30,7 +30,7 @@ class HeroesProvider extends ChangeNotifier {
       _heroesList = response.heroes;
       _totalHeroes = response.total;
     } catch (e) {
-      // Handle error
+      // (SF) Tratar erro aqui
     }
 
     _isLoading = false;

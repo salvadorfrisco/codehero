@@ -21,10 +21,7 @@ void main() {
 class MockHeroRepository implements HeroRepository {
   @override
   Future<HeroResponse> getHeroes({required int offset, String? name}) async {
-    // Simulate fetching data from an API
     await Future.delayed(const Duration(seconds: 1));
-
-    // Return a dummy HeroResponse
     return HeroResponse(heroes: [], offset: 0, limit: 4, count: 0, total: 0);
   }
 }

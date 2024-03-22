@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) {
         final provider = HeroesProvider();
-        provider.loadHeroes(); // Carrega todos os heróis iniciais
+        provider.loadHeroes();
         return provider;
       },
       child: _HomePage(),
