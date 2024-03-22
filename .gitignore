@@ -9,8 +9,6 @@
 .history
 .vscode
 .svn/
-android
-web
 migrate_working_dir/
 /lib/secrets.dart
 
