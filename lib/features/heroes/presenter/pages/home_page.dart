@@ -44,7 +44,8 @@ class _HomePage extends StatelessWidget {
                   appBar: AppBar(
                     toolbarHeight: 136,
                     title: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.only(
+                          top: 20, right: 24, bottom: 34, left: 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -93,8 +94,6 @@ class _HomePage extends StatelessWidget {
                               return TextFormField(
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
-                                  contentPadding:
-                                      EdgeInsets.symmetric(horizontal: 8.0),
                                 ),
                                 textAlignVertical: TextAlignVertical.center,
                                 onChanged: (value) {
@@ -121,7 +120,7 @@ class _HomePage extends StatelessWidget {
       return Column(
         children: <Widget>[
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24),
+            margin: const EdgeInsets.symmetric(horizontal: 42),
             height: 40,
             alignment: Alignment.center,
             child: Row(
@@ -140,7 +139,7 @@ class _HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
                   flex: 1,
                   child: Container(
@@ -155,7 +154,7 @@ class _HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
                   flex: 2,
                   child: Container(
@@ -181,7 +180,7 @@ class _HomePage extends StatelessWidget {
                   ))
                 : heroes.heroesList.isNotEmpty
                     ? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        padding: const EdgeInsets.symmetric(horizontal: 42),
                         child: HeroList(
                           heroesList: heroes.heroesList,
                           web: true,
@@ -200,25 +199,23 @@ class _HomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 IconButton(
-                  onPressed: heroes.previousPage,
-                  icon: const Icon(Icons.arrow_left),
-                  iconSize: 48,
-                  color: heroes.currentPage > 0
-                      ? Theme.of(context).primaryColor
-                      : Colors.black26,
-                ),
-                const SizedBox(width: 16),
-                ..._buildPageButtons(context, heroes),
-                const SizedBox(width: 16),
+                    onPressed: heroes.previousPage,
+                    icon: const Icon(Icons.arrow_left),
+                    iconSize: 48,
+                    color: heroes.currentPage > 0
+                        ? Theme.of(context).primaryColor
+                        : Theme.of(context).disabledColor),
+                const SizedBox(width: 12),
+                ..._buildPageButtons(context, heroes, true),
+                const SizedBox(width: 12),
                 IconButton(
-                  onPressed: heroes.nextPage,
-                  icon: const Icon(Icons.arrow_right),
-                  iconSize: 48,
-                  color:
-                      heroes.currentPage + 1 < (heroes.totalHeroes / 4).ceil()
-                          ? Theme.of(context).primaryColor
-                          : Colors.black26,
-                ),
+                    onPressed: heroes.nextPage,
+                    icon: const Icon(Icons.arrow_right),
+                    iconSize: 48,
+                    color:
+                        heroes.currentPage + 1 < (heroes.totalHeroes / 4).ceil()
+                            ? Theme.of(context).primaryColor
+                            : Theme.of(context).disabledColor),
               ],
             ),
           ),
@@ -279,10 +276,10 @@ class _HomePage extends StatelessWidget {
                   iconSize: 48,
                   color: heroes.currentPage > 0
                       ? Theme.of(context).primaryColor
-                      : Colors.black26,
+                      : Theme.of(context).disabledColor,
                 ),
                 const SizedBox(width: 16),
-                ..._buildPageButtons(context, heroes),
+                ..._buildPageButtons(context, heroes, false),
                 const SizedBox(width: 16),
                 IconButton(
                   onPressed: heroes.nextPage,
@@ -291,7 +288,7 @@ class _HomePage extends StatelessWidget {
                   color:
                       heroes.currentPage + 1 < (heroes.totalHeroes / 4).ceil()
                           ? Theme.of(context).primaryColor
-                          : Colors.black26,
+                          : Theme.of(context).disabledColor,
                 ),
               ],
             ),
@@ -305,13 +302,16 @@ class _HomePage extends StatelessWidget {
     });
   }
 
-  List<Widget> _buildPageButtons(BuildContext context, HeroesProvider heroes) {
+  List<Widget> _buildPageButtons(
+      BuildContext context, HeroesProvider heroes, bool web) {
     final List<Widget> buttons = [];
     final int totalPages = (heroes.totalHeroes / 4).ceil();
+    final int numberButtons = web ? 4 : 2;
     final int startPage =
         heroes.currentPage > 0 ? heroes.currentPage - 1 : heroes.currentPage;
-    final int endPage =
-        startPage + 2 < totalPages ? startPage + 2 : totalPages - 1;
+    final int endPage = startPage + numberButtons < totalPages
+        ? startPage + numberButtons
+        : totalPages - 1;
 
     for (int i = startPage; i <= endPage; i++) {
       buttons.add(_buildPageButton(context, heroes, i + 1));
