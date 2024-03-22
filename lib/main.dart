@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
       primaryColor: const Color(0xFFD42026),
       primaryColorDark: const Color(0xFF4E4E4E),
       primaryColorLight: const Color(0xFFFFFFFF),
+      disabledColor: const Color(0xEEF7AEB0),
       textTheme: const TextTheme(
         bodyLarge: TextStyle(
           fontSize: 21,
