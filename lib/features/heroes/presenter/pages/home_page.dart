@@ -95,11 +95,8 @@ class _HomePage extends StatelessWidget {
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
                                   ),
-                                  style: const TextStyle(
-                                      fontSize:
-                                          16), // Defina o tamanho da fonte desejado
-                                  textAlignVertical: TextAlignVertical
-                                      .center, // Centralize verticalmente
+                                  style: const TextStyle(fontSize: 16),
+                                  textAlignVertical: TextAlignVertical.center,
                                   onChanged: (value) {
                                     heroes.setFilterName(value);
                                   },
