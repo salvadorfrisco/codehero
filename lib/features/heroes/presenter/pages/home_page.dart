@@ -90,17 +90,19 @@ class _HomePage extends StatelessWidget {
                           SizedBox(
                             height: 40,
                             child: Consumer<HeroesProvider>(
-                                builder: (context, heroes, child) {
-                              return TextFormField(
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                ),
-                                textAlignVertical: TextAlignVertical.center,
-                                onChanged: (value) {
-                                  heroes.setFilterName(value);
-                                },
-                              );
-                            }),
+                              builder: (context, heroes, child) {
+                                return TextFormField(
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  style: const TextStyle(fontSize: 16),
+                                  textAlignVertical: TextAlignVertical.center,
+                                  onChanged: (value) {
+                                    heroes.setFilterName(value);
+                                  },
+                                );
+                              },
+                            ),
                           ),
                           const SizedBox(height: 12),
                         ],
@@ -306,11 +308,14 @@ class _HomePage extends StatelessWidget {
       BuildContext context, HeroesProvider heroes, bool web) {
     final List<Widget> buttons = [];
     final int totalPages = (heroes.totalHeroes / 4).ceil();
-    final int numberButtons = web ? 4 : 2;
-    final int startPage =
-        heroes.currentPage > 0 ? heroes.currentPage - 1 : heroes.currentPage;
-    final int endPage = startPage + numberButtons < totalPages
-        ? startPage + numberButtons
+    final int numberButtons = web ? 5 : 3;
+    final int centerButtonIndex = numberButtons ~/ 2;
+    int startPage = heroes.currentPage - centerButtonIndex;
+    if (startPage < 0) {
+      startPage = 0;
+    }
+    final int endPage = startPage + numberButtons - 1 < totalPages
+        ? startPage + numberButtons - 1
         : totalPages - 1;
 
     for (int i = startPage; i <= endPage; i++) {
@@ -335,12 +340,14 @@ class _HomePage extends StatelessWidget {
           border: Border.all(color: Theme.of(context).primaryColor, width: 1.5),
           color: isActive ? Theme.of(context).primaryColor : null,
         ),
-        child: Text(
-          '$page',
-          style: TextStyle(
-            color: isActive
-                ? Theme.of(context).primaryColorLight
-                : Theme.of(context).primaryColor,
+        child: Center(
+          child: Text(
+            '$page',
+            style: TextStyle(
+              color: isActive
+                  ? Theme.of(context).primaryColorLight
+                  : Theme.of(context).primaryColor,
+            ),
           ),
         ),
       ),
